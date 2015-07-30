@@ -1,8 +1,9 @@
 import os
 import time
 import re
-
 import sqlite3
+
+
 conn = sqlite3.connect('banlist.db')
 c = conn.cursor()
 print "loading ban"
@@ -18,14 +19,14 @@ except:
 
 
 print "start ban"
-OLD_POSITION = 0
+OLD_POSITION_SSH = 0
 
 
 def checking_ssh():
-    global OLD_POSITION
+    global OLD_POSITION_SSH
     ban_list = []
     f = open('/var/log/auth.log')
-    f.seek(OLD_POSITION)
+    f.seek(OLD_POSITION_SSH)
     for line in f:
         if "Failed" in line:
             try:
@@ -42,16 +43,16 @@ def checking_ssh():
         except:
             pass
 
-    OLD_POSITION = f.tell()
+    OLD_POSITION_SSH = f.tell()
     f.close()
     conn.commit()
 
-
+OLD_POSITION_NGINX = 0
 def checking_nginx():
-    global OLD_POSITION
+    global OLD_POSITION_NGINX
     ban_list = []
     f = open('/var/log/nginx/access.log')
-    f.seek(OLD_POSITION)
+    f.seek(OLD_POSITION_NGINX)
     for line in f:
         if "robots" not in line:
             try:
@@ -68,7 +69,7 @@ def checking_nginx():
         except:
             pass
 
-    OLD_POSITION = f.tell()
+    OLD_POSITION_NGINX = f.tell()
     f.close()
     conn.commit()
 
@@ -76,4 +77,3 @@ while True:
     checking_ssh()
 #    checking_nginx()
     time.sleep(30)
-
